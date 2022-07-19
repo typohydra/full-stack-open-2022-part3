@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
+var morgan = require('morgan')
 
 app.use(express.json())
+app.use(morgan('tiny'))
 
 let persons = 
 [
@@ -72,7 +74,7 @@ app.post('/api/persons', (req, res) => {
   }
 
   const id = Math.floor(Math.random() * 1000000000)
-  
+
   const person = {
     id: id,
     name: body.name,
