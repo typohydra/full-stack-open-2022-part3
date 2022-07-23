@@ -33,18 +33,18 @@ app.get('/info', (req, res, next) => {
 
 app.get('/api/persons/:id', (req, res, next) => {
   Person
-  .findById(req.params.id)
-  .then(person => {
-    if(person) {res.json(person)}
-    else {res.status(404).end()}
-  })
-  .catch(error => next(error))
+    .findById(req.params.id)
+    .then(person => {
+      if(person) {res.json(person)}
+      else {res.status(404).end()}
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Person
     .findByIdAndRemove(req.params.id)
-    .then(result => {
+    .then(() => {
       res.status(204).end()
     })
     .catch(error => next(error))
@@ -54,14 +54,14 @@ app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
   Person
-    .findOne({name: body.name})
+    .findOne({ name: body.name })
     .then(result => {
       if(result) {
         const err = new Error(`${body.name} is already added to phonebook`)
         err.name = 'postExistingUserError'
         throw err
       }
-      return;
+      return
     })
     .then(() => {
       const person = new Person({
@@ -82,7 +82,7 @@ app.put('/api/persons/:id', (req, res, next) => {
 
   Person
     .findByIdAndUpdate(
-      req.params.id, 
+      req.params.id,
       { name, number },
       { new: true, runValidators: true, context: 'query' }
     )
@@ -98,9 +98,9 @@ const errorHandler = (error, req, res, next) => {
   if (error.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
-    return res.status(400).json({error: error.message})
+    return res.status(400).json({ error: error.message })
   } else if (error.name === 'postExistingUserError') {
-    return res.status(400).json({error: error.message});
+    return res.status(400).json({ error: error.message })
   }
 
   next(error)
@@ -110,5 +110,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`)
 })

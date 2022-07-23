@@ -43,10 +43,10 @@ function addPerson() {
 
 function displayPeople() {
   Person
-  .find({})
-  .then(result => {
-    console.log('phonebook:')
-    result.forEach(person => {console.log(person.name, person.number)})
-    mongoose.connection.close()
-  })
+    .find({})
+    .then(result => {
+      console.log('phonebook:')
+      result.forEach(person => {console.log(person.name, person.number)})
+      mongoose.connection.close()
+    })
 }
