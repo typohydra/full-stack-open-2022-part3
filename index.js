@@ -52,22 +52,28 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
-  console.log(body.name)
-  
-  if(!body.name || !body.number) {
-    return res.status(400).json({
-      error: `name and/or number missing`
+
+  Person
+    .findOne({name: body.name})
+    .then(result => {
+      if(result) {
+        const err = new Error(`${body.name} is already added to phonebook`)
+        err.name = 'postExistingUserError'
+        throw err
+      }
+      return;
     })
-  }
+    .then(() => {
+      const person = new Person({
+        name: body.name,
+        number: body.number
+      })
 
-  const person = new Person({
-    name: body.name,
-    number: body.number
-  })
-
-  person
-    .save()
-    .then(savedPerson => res.json(savedPerson))
+      return person.save()
+    })
+    .then(savedPerson => {
+      return res.json(savedPerson)
+    })
     .catch(error => next(error))
 })
 
@@ -93,6 +99,8 @@ const errorHandler = (error, req, res, next) => {
     return res.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return res.status(400).json({error: error.message})
+  } else if (error.name === 'postExistingUserError') {
+    return res.status(400).json({error: error.message});
   }
 
   next(error)
